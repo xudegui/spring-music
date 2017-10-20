@@ -1,5 +1,12 @@
-
----
 spring:
   jpa:
     generate-ddl: true
+    show-sql: true
+
+endpoints:
+  default:
+    enabled: true
+    web:
+      enabled: true
+  env:
+    enabled: true
