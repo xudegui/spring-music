@@ -34,9 +34,13 @@ jobs:
         args:
         - -exc
         - |
+          export GRADLE_OPTS=-Dorg.gradle.native=false
           ls app_sources
-          app_sources/gradlew assemble
-          mv build/libs/spring-music*.jar ../spring_music_jar
+          cd app_sources
+          gradle assemble
+          cp build/libs/spring-music.jar ../spring_music_jar/
+          cp manifest.yml ../spring_music_jar/
+          ls ../spring_music_jar/
   - put: staging_deployment
     params:
-      manifest: app_sources/manifest.yml
+      manifest: spring_music_jar/manifest.yml
