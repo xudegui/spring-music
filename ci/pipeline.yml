@@ -1,0 +1,42 @@
+resources:
+- name: app_sources
+  type: git
+  source:
+    uri: https://github.com/xudegui/spring-music
+- name: staging_deployment
+  type: cf
+  source:
+    api: https://api.sys.xudegui.co
+    username: user20
+    password: pivotal
+    organization: org20
+    space: Workshop
+    skip_cert_check: true
+
+jobs:
+- name: build-deploy
+  serial: true
+  plan:
+  - get: app_sources
+    trigger: true
+  - task: build 
+    config:
+      platform: linux
+      inputs:
+      - name: app_sources
+      outputs:
+      - name: spring_music_jar
+      image_resource:
+        type: docker-image
+        source: { repository: brianbyers/concourse-gradle }
+      run:
+        path: sh
+        args:
+        - -exc
+        - |
+          ls app_sources
+          app_sources/gradlew assemble
+          mv build/libs/spring-music*.jar ../spring_music_jar
+  - put: staging_deployment
+    params:
+      manifest: app_sources/manifest.yml
